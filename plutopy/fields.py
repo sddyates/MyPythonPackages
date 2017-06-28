@@ -8,7 +8,22 @@ from yt import derived_field
 from yt.units.yt_array import YTQuantity
 from scipy.spatial.distance import euclidean
 
+
+def unit_override():
+    return {"length_unit":(1,"Rsun"),
+            "time_unit":(6.955e+05 ,"s"),
+            "mass_unit":(3.36427433875e+17,"g"),
+            "magnetic_unit":(1.121e-02,"G")}
+
 def create_fields(ds):
+
+    def _radialvelocity(field, data):
+        return data['velocity_x']*data['x']/data['radius'] + \
+               data['velocity_y']*data['y']/data['radius'] + \
+               data['velocity_z']*data['z']/data['radius']
+
+    def _temperature(field, data):
+        return (data["gas", "pressure"]*1.01*mp)/(data["gas", "density"]*kb)
 
     def _radius_planet(field, data):
         a = 0.047*1.496e+13/6.955e+10
@@ -149,5 +164,7 @@ def create_fields(ds):
     ds.add_field(('gas', "fc"), function=_fc, units="MHz", take_log=False)
     ds.add_field(('gas', "fp"), function=_fp, units="MHz", take_log=False)
     ds.add_field(('gas', "fc/fp"), function=_f_ratio, units="", take_log=True)
+    ds.add_field(('gas', "temperature"), function=_temperature, units="K", take_log=True)
+    ds.add_field(('gas', "radialvelocity"), function=_radialvelocity, units="cm/s", take_log=False)
 
 

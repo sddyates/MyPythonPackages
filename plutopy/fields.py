@@ -142,6 +142,11 @@ def create_fields(ds):
     def _mag_field_strength(field,data):
         return np.sqrt(8.*np.pi*data["mag_energy"])
 
+    def _mag_field_magnitude(field,data):
+        return (data["Bx1"]**2 +
+                data["Bx2"]**2 +
+                data["Bx3"]**2)
+
     def _plasma_b(field,data):
         return data['pressure']/data['mag_energy']
 
@@ -159,6 +164,7 @@ def create_fields(ds):
     ds.add_field(("gas", "Bx3"), function=_Bx3, units="G", take_log=False)
     ds.add_field(("gas", "mag_energy"), function=_mag_energy, units="g*cm**-1*s**-2", take_log=True)
     ds.add_field(("gas", "mag_field_strength"), function=_mag_field_strength, units="G", take_log=True)
+    ds.add_field(("gas", "mag_field_magnitude"), function=_mag_field_magnitude, units="G", take_log=True)
     ds.add_field(("gas", "plasma_b"), function=_plasma_b, units="")
     ds.add_field(("gas", "ni"), function=_ni, units="cm**-3")
     ds.add_field(('gas', "fc"), function=_fc, units="MHz", take_log=False)

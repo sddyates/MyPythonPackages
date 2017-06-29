@@ -16,6 +16,8 @@ def mass_loss(ts, file_name='mass_loss.txt'):
     system_mass_loss = []
     time = []
 
+    Rsun = 6.955e10
+
     for i, ds in enumerate(ts):
         
         create_fields(ds)
@@ -23,28 +25,42 @@ def mass_loss(ts, file_name='mass_loss.txt'):
 
         # Planet
         cp = yt.YTArray([0.047, 0.0, 0.0], 'au').convert_to_units('cm')
-        rp = YTQuantity(2.0, 'Rsun')
+        rp = YTQuantity(2.0, 'Rsun').in_cgs()
         sp = ds.sphere(cp, rp)
-        pr = YTQuantity(1.0, "Rsun")
+        pr = YTQuantity(0.75, "Rsun").in_cgs() 
         surfp = ds.surface(sp, 'radius_planet', pr)
-        print(rp, pr)
-        density_flux_p = surfp.calculate_flux("velocity_x", "velocity_y", "velocity_z", "density")*(6.95e10**2)
+        density_flux_p = surfp.calculate_flux("velocity_x", 
+                                              "velocity_y", 
+                                              "velocity_z", 
+                                              "density"
+                                              )
+        density_flux_p *= Rsun**2
 
         #Star
         cs = yt.YTArray([0.0, 0.0, 0.0], 'au').convert_to_units('Rsun')
-        rs = YTQuantity(5.0, 'Rsun')
+        rs = YTQuantity(5.0, 'Rsun').in_cgs()
         ss = ds.sphere(cs, rs)
-        sr = YTQuantity(2.0, "Rsun")
+        sr = YTQuantity(2.0, "Rsun").in_cgs()
         surfs = ds.surface(ss, 'radius', sr)
-        density_flux_s = surfs.calculate_flux("velocity_x", "velocity_y", "velocity_z", "density")*(6.95e10**2)
+        density_flux_s = surfs.calculate_flux("velocity_x", 
+                                              "velocity_y", 
+                                              "velocity_z", 
+                                              "density"
+                                              )
+        density_flux_s *= Rsun**2
 
         #System
         cs = yt.YTArray([0.0, 0.0, 0.0], 'au').convert_to_units('Rsun')
-        rs = YTQuantity(31.0, 'Rsun')
+        rs = YTQuantity(32.0, 'Rsun').in_cgs()
         ss = ds.sphere(cs, rs)
-        sr = YTQuantity(32.0, "Rsun")
+        sr = YTQuantity(31.0, "Rsun").in_cgs()
         surfs = ds.surface(ss, 'radius', sr)
-        density_flux_system = surfs.calculate_flux("velocity_x", "velocity_y", "velocity_z", "density")*(6.95e10**2)
+        density_flux_system = surfs.calculate_flux("velocity_x", 
+                                                   "velocity_y", 
+                                                   "velocity_z", 
+                                                   "density"
+                                                   )
+        density_flux_system *= Rsun**2
 
         planet_mass_loss.append(density_flux_p)
         star_mass_loss.append(density_flux_s)

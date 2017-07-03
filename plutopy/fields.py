@@ -143,7 +143,7 @@ def create_fields(ds):
         return np.sqrt(8.*np.pi*data["mag_energy"])
 
     def _mag_field_magnitude(field,data):
-        return (data["Bx1"]**2 +
+        return np.sqrt(data["Bx1"]**2 +
                 data["Bx2"]**2 +
                 data["Bx3"]**2)
 

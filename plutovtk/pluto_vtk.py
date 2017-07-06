@@ -17,7 +17,7 @@ def file_name(n, data_dir):
 
 def setup_vtk(filename):
     """
-    Set vtk reader and get vector dimantions.
+    Set vtk reader and get vector dimansions.
     """
     from vtk import vtkStructuredGridReader
     from vtk import vtkGenericDataObjectReader

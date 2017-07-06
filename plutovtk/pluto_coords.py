@@ -56,7 +56,7 @@ def spherical_coordinates_vtk(data, dim):
     """
     import numpy as np
 
-    theta1 = np.array([i * np.pi / 100.0 for i in range(101)])
+    theta1 = np.array([i * np.pi / 120.0 for i in range(121)])
     phi1 = np.array([j * np.pi / 120.0 for j in range(241)])
 
     r1 = np.zeros(data.GetNumberOfPoints())

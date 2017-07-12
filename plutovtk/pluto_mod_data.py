@@ -20,6 +20,6 @@ def interpolate(x1, x2, x3, grid, x1_rez, x2_rez, x3_rez, U):
     dx1 = (max(x1) - min(x1)) / len(x1i[:, 0, 0])
     dx2 = (max(x2) - min(x2)) / len(x2i[0, :, 0])
     dx3 = (max(x3) - min(x3)) / len(x3i[0, 0, :])
-    return Ui, dx1, dx2, dx3
+    return Ui, ri, dx1, dx2, dx3
 
 

@@ -8,6 +8,7 @@ from pluto_mod_data import \
     interpolate
 
 from pluto_radio import \
+    radio_emission_temp, \
     radio_emission, \
     tau
 
@@ -17,4 +18,5 @@ from pluto_vtk import \
     read_vtk
 
 from pluto_yt import \
-    yt_setup
+    yt_setup, \
+    yt_setup_tau

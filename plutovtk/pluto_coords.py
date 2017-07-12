@@ -135,9 +135,14 @@ def convert_coordinates(grid, data_geometry, plot_geometry):
     return x1, x2, x3, gridc, limits
     #return gridc, limits
 
-def rotation(grid, rot, plot_geometry):
+def rotation(grid, alpha, beta, gamma, plot_geometry):
     """
     Rotate the simulation data around the z-axis.
+
+    This is of course the grid that was originally 
+    created in the main program and there for 
+    we are modiflying the variable not generating 
+    a new one.
     """
     import numpy as np
 
@@ -146,24 +151,25 @@ def rotation(grid, rot, plot_geometry):
         x2 = grid[:, 1]
         x3 = grid[:, 2]
         # rotation about z
-        x1z = x1*np.cos(rot) - x2*np.sin(rot)
-        x2z = x1*np.sin(rot) + x2*np.cos(rot)
+        x1z = x1*np.cos(gamma) - x2*np.sin(gamma)
+        x2z = x1*np.sin(gamma) + x2*np.cos(gamma)
         x3z = x3
-        """
         # rotation about y
-        x1y = x1z*np.cos(rot[1]) + x3z*np.sin(rot[1])
+        x1y = x1z*np.cos(beta) + x3z*np.sin(beta)
         x2y = x2z
-        x3y = -x1z*np.sin(rot[1]) + x3z*np.cos(rot[1])
+        x3y = -x1z*np.sin(beta) + x3z*np.cos(beta)
         # rotation about x
-        x1x = x1y
-        x2x = x2y*np.cos(rot[0]) - x3y*np.sin(rot[0])
-        x3x = x2y*np.sin(rot[0]) + x3y*np.cos(rot[0])
-        """
-        grid[:, 0] = x1z
-        grid[:, 1] = x2z
-        grid[:, 2] = x3z
-    elif (plot_geometry == 'spherical'):
-        grid[:, 2] = grid[:, 2] + rot[2]
-    return grid
+        x1 = x1y
+        x2 = x2y*np.cos(alpha) - x3y*np.sin(alpha)
+        x3 = x2y*np.sin(alpha) + x3y*np.cos(alpha)
+
+        grid_new = np.zeros_like(grid)        
+        grid_new[:, 0] = x1
+        grid_new[:, 1] = x2
+        grid_new[:, 2] = x3
+
+    del x1, x2, x3
+
+    return grid_new
 
 

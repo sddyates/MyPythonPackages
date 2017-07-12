@@ -254,7 +254,7 @@ def rotation(grid, alpha, beta, gamma, plot_geometry):
 
     TODO
     ----
-    - Improve error handeling.
+    - Improve error handling.
     """
 
     if (plot_geometry == 'cartesian'):
@@ -282,5 +282,31 @@ def rotation(grid, alpha, beta, gamma, plot_geometry):
     del x1, x2, x3
 
     return grid_new
+
+if __name__ == '__main__':
+
+    import unittest
+
+    class rotate_test(unittest.TestCase):
+
+        def test_pp(self):
+            input_coords = np.array([[1.0, 1.0, 1.0]])
+            output_coords = np.array([[1.0, -1.0, 1.0]])
+
+            result = rotation(
+                input_coords, 
+                np.pi/2.0, 
+                np.pi/2.0, 
+                np.pi/2.0, 
+                'cartesian'
+                )
+
+            self.assertTrue(np.allclose(result, output_coords))
+
+    unittest.main(exit=False)
+
+
+
+
 
 

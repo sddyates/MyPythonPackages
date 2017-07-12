@@ -1,8 +1,38 @@
+
+# coding: utf-8
+
+import numpy as np
+
 def cartesian_coordinates_vtk(data, dim):
     """
+    Synopsis
+    --------
     Get coordinates from the data object (Cartesian).
+
+    Parameters
+    ----------
+    data: object-like
+        VTK data object containing the data read from 
+        the simulation output.
+
+    dim: int-like
+        dimensions of the simulations.     
+
+    Returns
+    -------
+    x, y, z: np.arrays of the unique x, y, z coordinates 
+        of the simulation data.
+
+    grid: 3 dimensional np.array containing all the 
+        coordinates which form the grid.
+
+    limits: 3x2 array contaning the limits of the 
+        simulation box.
+
+    TODO
+    ----
+    - Possibly combine x, y, z and grid into just grid.
     """
-    import numpy as np
 
     xg = np.zeros(data.GetNumberOfPoints())
     yg = np.zeros(data.GetNumberOfPoints())
@@ -52,9 +82,34 @@ def cartesian_coordinates_vtk(data, dim):
 
 def spherical_coordinates_vtk(data, dim):
     """
+    Synopsis
+    --------
     Get coordinates from data object (spherical).
+
+    Parameters
+    ----------
+    data: object-like
+        VTK data object containing the data read from 
+        the simulation output.
+
+    dim: int-like
+        dimensions of the simulations.     
+
+    Returns
+    -------
+    r, theta, phi: np.arrays of the unique r, theta, phi 
+        coordinates of the simulation data.
+
+    grid: 3 dimensional np.array containing all the 
+        coordinates which form the grid.
+
+    limits: 3x2 array contaning the limits of the 
+        simulation box.
+
+    TODO
+    ----
+    - Possibly combine x, y, z and grid into just grid.
     """
-    import numpy as np
 
     theta1 = np.array([i * np.pi / 120.0 for i in range(121)])
     phi1 = np.array([j * np.pi / 120.0 for j in range(241)])
@@ -103,9 +158,38 @@ def spherical_coordinates_vtk(data, dim):
 
 def convert_coordinates(grid, data_geometry, plot_geometry):
     """
+    Synopsis
+    --------
     Convert between Cartesian and spherical polar coordinates.
+
+    Parameters
+    ----------
+    grid: array-like
+        3 dimensional np.array containing all the 
+        coordinates which form the grid.
+
+    data_geometry: string-like
+        Geometry of the raw data read from the vtk file.     
+
+    plot_geometry: string-like
+        Geometry which is needed by the main program.     
+
+    Returns
+    -------
+    r, theta, phi: np.arrays of the unique r, theta, phi 
+        coordinates of the simulation data.
+
+    gridc: array-like
+        3 dimensional np.array containing the converted 
+        grid.
+
+    limits: 3x2 array contaning the limits of the 
+        simulation box (post conversion).
+
+    TODO
+    ----
+    - Improve error handeling.
     """
-    import numpy as np
 
     x1 = grid[:, 0]
     x2 = grid[:, 1]
@@ -125,6 +209,7 @@ def convert_coordinates(grid, data_geometry, plot_geometry):
         gridc[:, 2] = x1 * np.cos(x2)
 
     del x1,x2,x3
+
     x1 = np.unique(gridc[:, 0])
     x2 = np.unique(gridc[:, 1])
     x3 = np.unique(gridc[:, 2])
@@ -132,19 +217,45 @@ def convert_coordinates(grid, data_geometry, plot_geometry):
         [[round(x1.min(),-1), round(x1.max(),-1)], 
          [round(x2.min(),-1), round(x2.max(),-1)], 
          [round(x3.min(),-1), round(x3.max(),-1)]])
+
     return x1, x2, x3, gridc, limits
-    #return gridc, limits
+
 
 def rotation(grid, alpha, beta, gamma, plot_geometry):
     """
-    Rotate the simulation data around the z-axis.
+    Synopsis
+    --------
+    perform sucsessive rotations via rotation marixies 
+    on input data and return a new grid.
 
-    This is of course the grid that was originally 
-    created in the main program and there for 
-    we are modiflying the variable not generating 
-    a new one.
+    Parameters
+    ----------
+    grid: array-like
+        3 dimensional np.array containing all the 
+        coordinates which form the grid.
+
+    alpha: double-like
+        Angle to rotate about the x-axis.     
+
+    beta: double-like
+        Angle to rotate about the y-axis.     
+
+    gamma: double-like
+        Angle to rotate about the z-axis.     
+
+    plot_geometry: string-like
+        Geometry of the data.     
+
+    Returns
+    -------
+    grid_new: array-like
+        3 dimensional np.array containing the converted 
+        grid.
+
+    TODO
+    ----
+    - Improve error handeling.
     """
-    import numpy as np
 
     if (plot_geometry == 'cartesian'):
         x1 = grid[:, 0]

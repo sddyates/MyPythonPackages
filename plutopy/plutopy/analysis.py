@@ -1,22 +1,51 @@
+
 # coding: utf-8
-import yt
+
 import numpy as np
+
+import yt
+from yt.utilities.physical_constants import mp, kb
+from yt.units.yt_array import YTQuantity
+
 from mpl_toolkits.axes_grid1 import AxesGrid
 from matplotlib import pylab
 import matplotlib.pyplot as plt
-from yt.utilities.physical_constants import mp, kb
-from yt.utilities.physical_constants import mp, kb
-from yt.units.yt_array import YTQuantity
+
 from plutopy import create_fields
 
 def mass_loss(ts, file_name='mass_loss.txt'):
+    """
+    Synopsis
+    --------
+    This function calculates the mass-loss from 
+    the planet, star and system.
 
+    Parameters
+    ----------
+    ts: list-like
+        list of data sourses that forms a time-serise.
+
+    filename: string-like
+        name for output file.     
+
+    Returns
+    -------
+    None: does not return a variable.
+        Writes result to file 'outputs/'+filename
+
+    TODO
+    ----
+    - Make general ont dependant on the planet always 
+      being at 0.047 au.
+    """
+
+    # Initial list to stor mass-loss values.
     planet_mass_loss = []
     star_mass_loss = []
     system_mass_loss = []
     time = []
 
-    Rsun = 6.955e10
+    Rsun = 6.955e10 # [cm]
 
     for i, ds in enumerate(ts):
         
@@ -76,6 +105,29 @@ def mass_loss(ts, file_name='mass_loss.txt'):
 
 
 def mass_loss_plot(input_file='mass_loss.txt', output_file='mass_loss.png'):
+    """
+    Synopsis
+    --------
+    This function plots the results from the mass-loss 
+    calculations in function 'mass_loss'.
+
+    Parameters
+    ----------
+    input_file: string-like
+        name on file which mass-losses are saved to.
+
+    output_file: string-like
+        name for output file.     
+
+    Returns
+    -------
+    None : does not return a variable.
+        Produces a image in png/pdf format.
+
+    TODO
+    ----
+    - None :D
+    """
 
     time, star_mass_loss, planet_mass_loss, system_mass_loss = np.loadtxt(
         'outputs/'+input_file)

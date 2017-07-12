@@ -1,4 +1,6 @@
 from coordinates import \
+    Grid_spherical, \
+    Grid_Cartesian, \
     cartesian_coordinates_vtk, \
     spherical_coordinates_vtk, \
     convert_coordinates, \

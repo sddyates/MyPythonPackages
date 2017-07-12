@@ -3,7 +3,7 @@
 
 import numpy as np
 
-def cartesian_coordinates_vtk(data, dim):
+class Grid_Cartesian:
     """
     Synopsis
     --------
@@ -33,54 +33,37 @@ def cartesian_coordinates_vtk(data, dim):
     ----
     - Possibly combine x, y, z and grid into just grid.
     """
+    
+    def __init__(self, data, dim):
+        
+        self._xg = np.zeros(data.GetNumberOfPoints())
+        self._yg = np.zeros_like(self._yg)
+        self._zg = np.zeros_like(self._zg)
+        self._populate(self, data)
 
-    xg = np.zeros(data.GetNumberOfPoints())
-    yg = np.zeros(data.GetNumberOfPoints())
-    zg = np.zeros(data.GetNumberOfPoints())
+        # xg, yg, and zg are the coordinates of the cell edges.
+        self.z = (self._zg[0, 0, 1:] + self._zg[0, 0, :-1]) / 2.0
+        self.y = (self._yg[0, 1:, 0] + self._yg[0, :-1, 0]) / 2.0
+        self.x = (self._xg[1:, 0, 0] + self._xg[:-1, 0, 0]) / 2.0
 
-    for i in range(data.GetNumberOfPoints()):
-        xg[i], yg[i], zg[i] = data.GetPoint(i)
+        # Cast x, y and z into a form that can be used 
+        # for interpolation.
+        self.coords = self._get_coords(self, data)
 
-    xg = xg.reshape(dim, order='F')
-    yg = yg.reshape(dim, order='F')
-    zg = zg.reshape(dim, order='F')
+    def _populate(self, data):
+        for i in range(data.GetNumberOfPoints()):
+            self._xg[i], self._yg[i], self._zg[i] = data.GetPoint(i)
+        
+    def _get_coords(self):
+        return np.flip(np.vstack(np.meshgrid(z, y, x)).reshape(3, -1, order='C').T, 1)
 
-    xmin = min(xg[:, 0, 0])
-    xmax = max(xg[:, 0, 0])
-    ymin = min(yg[0, :, 0])
-    ymax = max(yg[0, :, 0])
-    zmin = min(zg[0, 0, :])
-    zmax = max(zg[0, 0, :])
 
-    x = np.zeros(len(xg[:, 0, 0]) - 1)
-    y = np.zeros(len(yg[0, :, 0]) - 1)
-    z = np.zeros(len(zg[0, 0, :]) - 1)
+    def limits(self):
+        return np.array([[min(self._xg[:, 0, 0]), max(self._xg[:, 0, 0])], 
+                         [min(self._yg[0, :, 0]), max(self._yg[0, :, 0])], 
+                         [min(self._zg[0, 0, :]), max(self._zg[0, 0, :])]])
 
-    for k in range(len(zg[0, 0, :]) - 1):
-        z[k] = (zg[0, 0, k] + zg[0, 0, k + 1]) / 2.0
-
-    for j in range(len(yg[0, :, 0]) - 1):
-        y[j] = (yg[0, j, 0] + yg[0, j + 1, 0]) / 2.0
-
-    for i in range(len(xg[:, 0, 0]) - 1):
-        x[i] = (xg[i, 0, 0] + xg[i + 1, 0, 0]) / 2.0
-
-    del xg, yg, zg
-
-    a = 0
-    grid = np.zeros((len(x) * len(y) * len(z), 3))
-    for k in range(len(z)):
-        for j in range(len(y)):
-            for i in range(len(x)):
-                grid[a, 0] = x[i]
-                grid[a, 1] = y[j]
-                grid[a, 2] = z[k]
-                a += 1
-
-    limits = np.array([[xmin, xmax], [ymin, ymax], [zmin, zmax]])
-    return x, y, z, grid, limits
-
-def spherical_coordinates_vtk(data, dim):
+class Grid_spherical:
     """
     Synopsis
     --------
@@ -110,51 +93,52 @@ def spherical_coordinates_vtk(data, dim):
     ----
     - Possibly combine x, y, z and grid into just grid.
     """
+    
+    def __init__(self, data, dim):
+        
+        self._r1 = np.zeros(data.GetNumberOfPoints())
+        self._r2 = np.zeros_like(self._r1)
+        self._r3 = np.zeros_like(self._r1)
 
-    theta1 = np.array([i * np.pi / 120.0 for i in range(121)])
-    phi1 = np.array([j * np.pi / 120.0 for j in range(241)])
+        self._theta1 = np.array([i * np.pi / 120.0 for i in range(121)])
+        self._phi1 = np.array([j * np.pi / 120.0 for j in range(241)])
+        self._populate(data, dim)
 
-    r1 = np.zeros(data.GetNumberOfPoints())
-    r2 = np.zeros(data.GetNumberOfPoints())
-    r3 = np.zeros(data.GetNumberOfPoints())
+        r = np.zeros(len(self._r3[:, 0, 0]) - 1)
+        self.r = (self._r3[1:, 0, 0] + self._r3[:-1, 0, 0]) / 2.0
+        self.theta = (self._theta1[1:] + self._theta1[:-1]) / 2.0
+        self.phi = (self._phi1[1:] + self._phi1[:-1]) / 2.0
 
-    for i in range(data.GetNumberOfPoints()):
-        r1[i], r2[i], r3[i] = data.GetPoint(i)
-    r3 = r3.reshape(dim, order='F')
+        #self.coords = self._get_coords(data)
+        self.coords = self._get_coords_old(data)
 
-    r = np.zeros(len(r3[:, 0, 0]) - 1)
-    theta = np.zeros(len(theta1) - 1)
-    phi = np.zeros(len(phi1) - 1)
+    def _populate(self, data, dim):
+        for i in range(data.GetNumberOfPoints()):
+            self._r1[i], self._r2[i], self._r3[i] = data.GetPoint(i)
+        self._r3 = self._r3.reshape(dim, order='F')
+        
+    def _get_coords(self, data):
+        return np.flip(np.vstack(
+                   np.meshgrid(self.phi, self.theta, self.r)
+                   ).reshape(3, -1, order='C').T, 1)
 
-    for i in range(len(r3[:, 0, 0]) - 1):
-        r[i] = (r3[i, 0, 0] + r3[i + 1, 0, 0]) / 2.0
+    def _get_coords_old(self, data):
+        a = 0
+        grid = np.zeros((len(self.r) * len(self.theta) * len(self.phi), 3))
+        for k in range(len(self.phi)):
+            for j in range(len(self.theta)):
+                for i in range(len(self.r)):
+                    grid[a, 0] = self.r[i]
+                    grid[a, 1] = self.theta[j]
+                    grid[a, 2] = self.phi[k]
+                    a += 1
+        return grid
 
-    for j in range(len(theta1) - 1):
-        theta[j] = (theta1[j] + theta1[j + 1]) / 2.0
+    def limits(self):
+        return np.array([[1, np.ceil(max(self._r3[:, 0, 0]))], 
+                         [0.0, np.pi], 
+                         [0.0, 2.0*np.pi]])
 
-    for k in range(len(phi1) - 1):
-        phi[k] = (phi1[k] + phi1[k + 1]) / 2.0
-
-    a = 0
-    grid = np.zeros((len(r) * len(theta) * len(phi), 3))
-    for k in range(len(phi)):
-        for j in range(len(theta)):
-            for i in range(len(r)):
-                grid[a, 0] = r[i]
-                grid[a, 1] = theta[j]
-                grid[a, 2] = phi[k]
-                a += 1
-
-    rmin = 1.0
-    rmax = np.ceil(max(r3[:, 0, 0]))
-    thetamin = 0.0
-    thetamax = np.pi
-    phimin = 0.0
-    phimax = 2.0 * np.pi
-    limits = np.array([[rmin, rmax], [thetamin, thetamax], [phimin, phimax]])
-    del r1,r2,r3
-
-    return r, theta, phi, grid, limits
 
 def convert_coordinates(grid, data_geometry, plot_geometry):
     """
@@ -207,8 +191,6 @@ def convert_coordinates(grid, data_geometry, plot_geometry):
         gridc[:, 0] = x1 * np.sin(x2) * np.cos(x3)
         gridc[:, 1] = x1 * np.sin(x2) * np.sin(x3)
         gridc[:, 2] = x1 * np.cos(x2)
-
-    del x1,x2,x3
 
     x1 = np.unique(gridc[:, 0])
     x2 = np.unique(gridc[:, 1])
@@ -304,9 +286,5 @@ if __name__ == '__main__':
             self.assertTrue(np.allclose(result, output_coords))
 
     unittest.main(exit=False)
-
-
-
-
 
 

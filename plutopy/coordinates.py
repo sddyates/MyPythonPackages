@@ -9,8 +9,8 @@ class Grid_Cartesian:
     --------
     Get coordinates from the data object (Cartesian).
 
-    Parameters
-    ----------
+    Args
+    ----
     data: object-like
         VTK data object containing the data read from 
         the simulation output.
@@ -18,16 +18,11 @@ class Grid_Cartesian:
     dim: int-like
         dimensions of the simulations.     
 
-    Returns
-    -------
+    Attributes
+    ----------
     x, y, z: np.arrays of the unique x, y, z coordinates 
         of the simulation data.
 
-    grid: 3 dimensional np.array containing all the 
-        coordinates which form the grid.
-
-    limits: 3x2 array contaning the limits of the 
-        simulation box.
 
     TODO
     ----
@@ -55,10 +50,22 @@ class Grid_Cartesian:
             self._xg[i], self._yg[i], self._zg[i] = data.GetPoint(i)
         
     def _get_coords(self):
+        """
+        Returns
+        -------
+        grid: 3 dimensional np.array containing all the 
+            coordinates which form the grid.
+        """
         return np.flip(np.vstack(np.meshgrid(z, y, x)).reshape(3, -1, order='C').T, 1)
 
 
     def limits(self):
+        """
+        Returns
+        -------
+        limits: 3x2 array contaning the limits of the 
+            simulation box.
+        """
         return np.array([[min(self._xg[:, 0, 0]), max(self._xg[:, 0, 0])], 
                          [min(self._yg[0, :, 0]), max(self._yg[0, :, 0])], 
                          [min(self._zg[0, 0, :]), max(self._zg[0, 0, :])]])
@@ -69,8 +76,8 @@ class Grid_spherical:
     --------
     Get coordinates from data object (spherical).
 
-    Parameters
-    ----------
+    Args
+    ----
     data: object-like
         VTK data object containing the data read from 
         the simulation output.
@@ -78,16 +85,10 @@ class Grid_spherical:
     dim: int-like
         dimensions of the simulations.     
 
-    Returns
-    -------
+    Attributes
+    ----------
     r, theta, phi: np.arrays of the unique r, theta, phi 
         coordinates of the simulation data.
-
-    grid: 3 dimensional np.array containing all the 
-        coordinates which form the grid.
-
-    limits: 3x2 array contaning the limits of the 
-        simulation box.
 
     TODO
     ----
@@ -118,11 +119,23 @@ class Grid_spherical:
         self._r3 = self._r3.reshape(dim, order='F')
         
     def _get_coords(self, data):
+        """
+        Retruns
+        -------
+        grid: 3 dimensional np.array containing all the 
+            coordinates which form the grid.
+        """
         return np.flip(np.vstack(
                    np.meshgrid(self.phi, self.theta, self.r)
                    ).reshape(3, -1, order='C').T, 1)
 
     def _get_coords_old(self, data):
+        """
+        Retruns
+        -------
+        grid: 3 dimensional np.array containing all the 
+            coordinates which form the grid.
+        """
         a = 0
         grid = np.zeros((len(self.r) * len(self.theta) * len(self.phi), 3))
         for k in range(len(self.phi)):
@@ -135,6 +148,12 @@ class Grid_spherical:
         return grid
 
     def limits(self):
+        """
+        Returns
+        -------
+        limits: 3x2 array contaning the limits of the 
+            simulation box.
+        """
         return np.array([[1, np.ceil(max(self._r3[:, 0, 0]))], 
                          [0.0, np.pi], 
                          [0.0, 2.0*np.pi]])

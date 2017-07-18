@@ -8,6 +8,7 @@ from modify_data import \
     interpolate
 
 from radio_calculations import \
+    radio_emission_temp_old, \
     radio_emission_temp, \
     radio_emission, \
     tau

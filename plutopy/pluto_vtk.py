@@ -45,17 +45,23 @@ def read_vtk(data, vec, sca):
     import numpy as np
     from vtk.util import numpy_support as VN
 
+    '''
     rho = VN.vtk_to_numpy(data.GetCellData().GetArray('rho'))
     prs = VN.vtk_to_numpy(data.GetCellData().GetArray('prs'))
     u = VN.vtk_to_numpy(data.GetCellData().GetArray('3D_Velocity_Field'))
     b = VN.vtk_to_numpy(data.GetCellData().GetArray('3D_Magnetic_Field'))
+    '''
+    rho = VN.vtk_to_numpy(data.GetCellData().GetScalars('rho'))
+    prs = VN.vtk_to_numpy(data.GetCellData().GetScalars('prs'))
+    u = VN.vtk_to_numpy(data.GetCellData().GetVectors('3D_Velocity_Field'))
+    b = VN.vtk_to_numpy(data.GetCellData().GetVectors('3D_Magnetic_Field'))
 
     # Redo if sim geometry is cartesian.
-    #rho = rho.reshape(sca, order='F')
-    #prs = prs.reshape(sca, order='F')
+    rho = rho.reshape(sca, order='F')
+    prs = prs.reshape(sca, order='F')
 
-    #u = u.reshape(vec, order='F')
-    #b = b.reshape(vec, order='F')
+    u = u.reshape(vec, order='F')
+    b = b.reshape(vec, order='F')
 
     return rho, prs, u, b
 

@@ -40,17 +40,6 @@ def create_fields(ds):
                  take_log=False)
 
 
-    def _mach_number(field, data):
-        """ M{|v|/c_sound} """
-        ftype = field.name[0]
-        return data[ftype, "velocity_magnitude"] / data[ftype, "sound_speed"]
-
-    ds.add_field(('gas', "mach_number"), 
-                 function=_mach_number, 
-                 units="", 
-                 take_log=False)
-
-
     def _sound_speed(field, data):
         gamma = 1.05
         ftype = field.name[0]
@@ -60,6 +49,17 @@ def create_fields(ds):
     ds.add_field(('gas', "sound_speed"), 
                  function=_sound_speed, 
                  units="cm/s", 
+                 take_log=False)
+
+
+    def _mach_number(field, data):
+        """ M{|v|/c_sound} """
+        ftype = field.name[0]
+        return data[ftype, "velocity_magnitude"] / data[ftype, "sound_speed"]
+
+    ds.add_field(('gas', "mach_number"), 
+                 function=_mach_number, 
+                 units="", 
                  take_log=False)
 
 
@@ -91,34 +91,6 @@ def create_fields(ds):
     ds.add_field(("gas", "ni"), 
                  function=_ni, 
                  units="cm**-3")
-
-
-    def _fc(field, data):
-        return YTQuantity(2.8, 'G**-1*MHz')*data["gas", "mag_field_strength"]
-
-    ds.add_field(('gas', "fc"), 
-                 function=_fc, 
-                 units="MHz", 
-                 take_log=True)
-
-
-    def _fp(field, data):
-        return YTQuantity(8.98e-3, 'cm**(3/2)*MHz')*\
-               np.sqrt(1.01*data["gas", "ni"])
-
-    ds.add_field(('gas', "fp"), 
-                 function=_fp, 
-                 units="MHz", 
-                 take_log=True)
-
-
-    def _f_ratio(field, data):
-        return data['gas', 'fc']/data['gas', 'fp']
-
-    ds.add_field(('gas', "fc/fp"), 
-                 function=_f_ratio, 
-                 units="", 
-                 take_log=True)
 
 
     def _BGx1(field, data):
@@ -348,27 +320,62 @@ def create_fields(ds):
                  take_log=True)
 
 
+    def _fc(field, data):
+        return YTQuantity(2.8, 'G**-1*MHz')*data["gas", "mag_field_strength"]
+
+    ds.add_field(('gas', "fc"), 
+                 function=_fc, 
+                 units="MHz", 
+                 take_log=True)
 
 
+    def _fp(field, data):
+        return YTQuantity(8.98e-3, 'cm**(3/2)*MHz')*\
+               np.sqrt(1.01*data["gas", "ni"])
+
+    ds.add_field(('gas', "fp"), 
+                 function=_fp, 
+                 units="MHz", 
+                 take_log=True)
 
 
+    def _f_ratio(field, data):
+        return data['gas', 'fc']/data['gas', 'fp']
+
+    ds.add_field(('gas', "fc/fp"), 
+                 function=_f_ratio, 
+                 units="", 
+                 take_log=True)
 
 
+    def _specific_angular_momentum_density_x(field, data):
+        return data["gas", "specific_angular_momentum_x"]*data["gas", "density"]
+
+    ds.add_field(('index', "specific_angular_momentum_density_x"), 
+                 function=_specific_angular_momentum_density_x, 
+                 units="cm**-1*g*s**-1", 
+                 take_log=False,
+                 force_override=True)
 
 
+    def _specific_angular_momentum_density_y(field, data):
+        return data["gas", "specific_angular_momentum_y"]*data["gas", "density"]
+
+    ds.add_field(('index', "specific_angular_momentum_density_y"), 
+                 function=_specific_angular_momentum_density_y, 
+                 units="cm**-1*g*s**-1", 
+                 take_log=False,
+                 force_override=True)
 
 
+    def _specific_angular_momentum_density_z(field, data):
+        return data["gas", "specific_angular_momentum_z"]*data["gas", "density"]
 
-
-
-
-
-
-
-
-
-
-
+    ds.add_field(('index', "specific_angular_momentum_density_z"), 
+                 function=_specific_angular_momentum_density_z, 
+                 units="cm**-1*g*s**-1", 
+                 take_log=False,
+                 force_override=True)
 
     ds.periodicity = (True, True, True)
 

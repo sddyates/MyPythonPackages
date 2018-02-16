@@ -57,8 +57,8 @@ def read_vtk(data, vec, sca):
     b = VN.vtk_to_numpy(data.GetCellData().GetVectors('3D_Magnetic_Field'))
 
     # Redo if sim geometry is cartesian.
-    rho = rho.reshape(sca, order='F')
-    prs = prs.reshape(sca, order='F')
+    #rho = rho.reshape(sca, order='F')
+    #prs = prs.reshape(sca, order='F')
 
     u = u.reshape(vec, order='F')
     b = b.reshape(vec, order='F')
